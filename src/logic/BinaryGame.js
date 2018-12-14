@@ -2,7 +2,7 @@ import isBinaryNumber from './isBinaryNumber';
 import CountdownTimer from './CountdownTimer';
 
 const initialTime = 10000;
-const defaultTimeBonus = 10000;
+const defaultTimeBonus = 30000;
 const byteMask = 0xFF;
 
 class BinaryGame {
@@ -59,10 +59,6 @@ class BinaryGame {
   }
 
   checkAnswer(answer) {
-    if (!isBinaryNumber(answer)) {
-      return false;
-    }
-
     let answerNumber = parseInt(answer, 2);
     let result;
     switch(this.operator) {
@@ -87,9 +83,20 @@ class BinaryGame {
       this.currentResultStr = '0b' + (result >>> 0).toString(2);
       this.generateNextQuiz();
       this.timer.addTime(defaultTimeBonus);
+
+      return true;
     }
 
-    return answerNumber === result;
+    if (this.gameOverCallback !== undefined) {
+      this.gameOverCallback();
+    }
+
+    return false;
+  }
+
+  setGameOverCallback(callback) {
+    this.gameOverCallback = callback;
+    this.timer.setEndCallback(callback);
   }
 }
 

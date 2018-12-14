@@ -6,7 +6,7 @@ const defaultMaxSumOperandValue = 20;
 const defaultMaxMulOperandValue = 10;
 const difficultyMultiplier = 0.1;
 const initialTime = 5000;
-const defaultTimeBonus = 5000;
+const defaultTimeBonus = 4000;
 
 class Game {
   constructor() {
@@ -33,8 +33,7 @@ class Game {
       this.nextOperand = factors[Math.round(Math.random() * (factors.length - 1))];
       this.operator = '/';
     } else if (operatorId < 2.0) {
-      let operand = Math.round(Math.random() * (1.0 + difficultyMultiplier * this.difficulty) * defaultMaxSumOperandValue);
-      this.nextOperand = (this.currentResult - operand > 0) ? operand : this.currentResult;
+      this.nextOperand = Math.round(Math.random() * this.currentResult);
       this.operator = '-'
     } else if (operatorId < 3.0) {
       this.nextOperand = Math.round(Math.random() * (1.0 + difficultyMultiplier * this.difficulty) * defaultMaxSumOperandValue);
@@ -46,10 +45,6 @@ class Game {
   }
 
   checkAnswer(answer) {
-    if (!isNumber) {
-      return false;
-    }
-
     let result;
     switch(this.operator) {
       case '/':
@@ -67,11 +62,23 @@ class Game {
 
     if (answer === result) {
       this.currentResult = result;
+      this.difficulty++;
       this.generateNextQuiz();
       this.timer.addTime(defaultTimeBonus);
+
+      return true;
     }
 
-    return answer === result;
+    if (this.gameOverCallback !== undefined) {
+      this.gameOverCallback();
+    }
+
+    return false;
+  }
+
+  setGameOverCallback(callback) {
+    this.gameOverCallback = callback;
+    this.timer.setEndCallback(callback);
   }
 }
 

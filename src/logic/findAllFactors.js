@@ -8,7 +8,7 @@ export default function findAllFactors(value) {
       result.push(Math.round(value / i));
     }
   }
-  if (value != 0)
+  if (value !== 0)
   {
     result.push(value);
   }
